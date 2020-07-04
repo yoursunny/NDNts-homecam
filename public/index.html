@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<title>NDNts homecam</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/purecss@1.0.1,npm/purecss@1.0.1/build/grids-responsive-min.min.css">
+<style>
+body { padding: 1em; }
+</style>
+
+<form id="app_watch_form" class="pure-form">
+<fieldset>
+<input id="app_watch_name" type="text" class="pure-input-2-3" placeholder="stream name">
+<button type="submit" class="pure-button">watch</button>
+</fieldset>
+</form>
+
+<form id="app_stream_form" class="pure-form">
+<fieldset>
+<input id="app_stream_name" type="text" class="pure-input-2-3" readonly>
+<button type="submit" class="pure-button" name="mode" value="camera">stream camera</button>
+<button type="submit" class="pure-button" name="mode" value="screen">stream screen</button>
+</fieldset>
+</form>
+
+<video id="app_video" class="hidden"></video>
+<canvas id="app_canvas" class="hidden"></canvas>
+<img id="app_viewer" class="hidden">
+
+<script src="bundle.js"></script>
