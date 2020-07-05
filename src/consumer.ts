@@ -3,15 +3,23 @@ import { Name } from "@ndn/packet";
 import { retrieveMetadata } from "@ndn/rdr";
 import { fetch } from "@ndn/segmented-object";
 
-let lastObjectUrl = "";
+import { getState } from "./connect";
+
 const endpoint = new Endpoint({ retx: 2 });
-let retrieveTimer = 0;
+let streamPrefix: Name;
+let $img: HTMLImageElement;
+let lastImageName = new Name();
+let lastObjectUrl = "";
 
-async function retrieveImage(prefix: Name, $img: HTMLImageElement) {
-  const m = await retrieveMetadata(prefix, { endpoint });
-  const imageBuffer = await fetch.promise(m.name, { endpoint });
+async function retrieveImage() {
+  const { name: imageName } = await retrieveMetadata(streamPrefix, { endpoint });
+  if (imageName.equals(lastImageName)) {
+    return;
+  }
+  lastImageName = imageName;
+
+  const imageBuffer = await fetch.promise(imageName, { endpoint });
   const imageBlob = new Blob([imageBuffer]);
-
   const objectUrl = URL.createObjectURL(imageBlob);
   $img.src = objectUrl;
   if (lastObjectUrl) {
@@ -20,8 +28,20 @@ async function retrieveImage(prefix: Name, $img: HTMLImageElement) {
   lastObjectUrl = objectUrl;
 }
 
-export function startConsumer(prefix: Name, $img: HTMLImageElement) {
-  clearInterval(retrieveTimer);
+async function reloadImage() {
+  try {
+    await retrieveImage();
+  } finally {
+    setTimeout(reloadImage, 200);
+  }
+}
 
-  retrieveTimer = setInterval(() => retrieveImage(prefix, $img), 1000) as unknown as number;
+export function startConsumer(id: string) {
+  const { sysPrefix } = getState();
+  streamPrefix = sysPrefix.append(id, "image");
+  $img = document.querySelector("#c_img") as HTMLImageElement;
+  setTimeout(reloadImage, 200);
+
+  document.querySelector("#c_id")!.textContent = id;
+  document.querySelector("#c_section")!.classList.remove("hidden");
 }

@@ -1,38 +1,43 @@
-import { Name } from "@ndn/packet";
+import { get as hashGet } from "hashquery";
 
-import { connect } from "./connect";
+import { connect, isID } from "./connect";
 import { startConsumer } from "./consumer";
-import { startCapture } from "./media";
+import type { Mode } from "./media";
 import { startProducer } from "./producer";
 
-function disableButtons() {
-  for (const $button of document.querySelectorAll("form button")) {
-    ($button as HTMLButtonElement).disabled = true;
-  }
-}
-
 async function main() {
-  const { prefix, dataSigner } = await connect();
-  (document.querySelector("#app_stream_name") as HTMLInputElement).value = prefix.toString();
+  await connect();
 
-  const imagePrefix = prefix.append("image");
-  const $streamForm = document.querySelector("#app_stream_form") as HTMLFormElement;
-  $streamForm.addEventListener("submit", async (evt) => {
+  const id = hashGet("viewer");
+  if (isID(id)) {
+    startConsumer(id);
+    document.querySelector("#home_section")!.classList.add("hidden");
+    return;
+  }
+
+  const $cForm = document.querySelector("#c_form") as HTMLFormElement;
+  $cForm.addEventListener("submit", (evt) => {
     evt.preventDefault();
-    const $submitter = (evt as any).submitter as HTMLButtonElement;
-    const captured = await startCapture($submitter.value as "camera"|"screen");
-    startProducer(imagePrefix, dataSigner, captured);
-    disableButtons();
+    const $cFormStream = document.querySelector("#c_form_stream") as HTMLInputElement;
+    const id = $cFormStream.value;
+    if (!isID(id)) {
+      alert("invalid stream ID"); // eslint-disable-line no-alert
+      return;
+    }
+    startConsumer(id);
+    document.querySelector("#home_section")!.classList.add("hidden");
   });
 
-  const $watchForm = document.querySelector("#app_watch_form") as HTMLFormElement;
-  $watchForm.addEventListener("submit", async (evt) => {
+  const $pForm = document.querySelector("#p_form") as HTMLFormElement;
+  $pForm.addEventListener("submit", async (evt) => {
     evt.preventDefault();
-    const prefix = new Name((document.querySelector("#app_watch_name") as HTMLInputElement).value).append("image");
-    const $viewer = document.querySelector("#app_viewer") as HTMLImageElement;
-    $viewer.classList.remove("hidden");
-    startConsumer(prefix, $viewer);
-    disableButtons();
+    const mode = ($pForm.querySelector("input[name=mode]:checked") as HTMLInputElement).value as Mode;
+    try {
+      await startProducer(mode);
+    } catch {
+      return;
+    }
+    document.querySelector("#home_section")!.classList.add("hidden");
   });
 }
 

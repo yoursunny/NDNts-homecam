@@ -9,7 +9,6 @@
   "dependencies": {
     "@ndn/autoconfig": "https://ndnts-nightly.ndn.today/autoconfig.tgz",
     "@ndn/endpoint": "https://ndnts-nightly.ndn.today/endpoint.tgz",
-    "@ndn/fw": "https://ndnts-nightly.ndn.today/fw.tgz",
     "@ndn/keychain": "https://ndnts-nightly.ndn.today/keychain.tgz",
     "@ndn/naming-convention2": "https://ndnts-nightly.ndn.today/naming-convention2.tgz",
     "@ndn/ndncert": "https://ndnts-nightly.ndn.today/ndncert.tgz",
@@ -18,6 +17,7 @@
     "@ndn/rdr": "https://ndnts-nightly.ndn.today/rdr.tgz",
     "@ndn/segmented-object": "https://ndnts-nightly.ndn.today/segmented-object.tgz",
     "@ndn/tlv": "https://ndnts-nightly.ndn.today/tlv.tgz",
+    "hashquery": "^1.0.0",
     "tslib": "^2.0.0"
   },
   "devDependencies": {

@@ -4,11 +4,22 @@ import { Certificate, CertNaming, KeyChain, RsaPrivateKey, ValidityPeriod } from
 import { CaProfile, ClientNopChallenge, requestCertificate } from "@ndn/ndncert";
 import { enableNfdPrefixReg } from "@ndn/nfdmgmt";
 import { Data, Name, Signer } from "@ndn/packet";
-import { Decoder, toHex } from "@ndn/tlv";
+import { Decoder } from "@ndn/tlv";
+
+export function isID(id: string): boolean {
+  return /^\d{9}$/.test(id);
+}
 
 const keyChain = KeyChain.open("homecam");
-let prefix: Name|undefined;
-let dataSigner: Signer|undefined;
+const state = {
+  sysPrefix: new Name("/localhost"),
+  myID: "000000000",
+  dataSigner: {} as unknown as Signer,
+};
+
+export function getState() {
+  return state;
+}
 
 async function openUplink() {
   const faces = await connectToTestbed({
@@ -25,8 +36,9 @@ async function openUplink() {
   return face;
 }
 
-async function obtainCert(profile: CaProfile, appPrefix: Name): Promise<Name> {
-  const subjectName = appPrefix.append(toHex(crypto.getRandomValues(new Uint8Array(8))));
+async function requestCert(profile: CaProfile): Promise<Certificate> {
+  state.myID = Math.floor(Math.random() * 999999999).toString(10).padStart(9, "0");
+  const subjectName = state.sysPrefix.append(state.myID);
   const [privateKey, publicKey] = await RsaPrivateKey.generate(subjectName, 2048, keyChain);
   const cert = await requestCertificate({
     profile,
@@ -36,30 +48,24 @@ async function obtainCert(profile: CaProfile, appPrefix: Name): Promise<Name> {
     challenges: [new ClientNopChallenge()],
   });
   await keyChain.insertCert(cert);
-  return cert.name;
+  return cert;
 }
 
 function publishCert(endpoint: Endpoint, cert: Certificate) {
   endpoint.produce(CertNaming.toKeyName(cert.name), async (interest) => {
     return cert.data;
-  }, {
-    announcement: false,
   });
 }
 
 function enablePing(endpoint: Endpoint) {
-  endpoint.produce(prefix!.append("ping"), async (interest) => {
+  endpoint.produce(state.sysPrefix.append(state.myID, "ping"), async (interest) => {
     const data = new Data(interest.name, Data.FreshnessPeriod(1));
-    await dataSigner!.sign(data);
+    await state.dataSigner.sign(data);
     return data;
   });
 }
 
-export async function connect(): Promise<{ prefix: Name; dataSigner: Signer }> {
-  if (prefix && dataSigner) {
-    return { prefix, dataSigner };
-  }
-
+export async function connect() {
   const [profile, face] = await Promise.all([
     (async () => {
       const resp = await fetch("profile.data");
@@ -70,25 +76,36 @@ export async function connect(): Promise<{ prefix: Name; dataSigner: Signer }> {
     openUplink(),
   ]);
 
-  const appPrefix = profile.prefix.getPrefix(-1).append("homecam");
-  const list = await keyChain.listCerts(appPrefix);
-  const certName = list.length > 0 ? list[0] : await obtainCert(profile, appPrefix);
-  const cert = await keyChain.getCert(certName);
+  state.sysPrefix = profile.prefix.getPrefix(-1).append("homecam");
+  const list = await keyChain.listCerts(state.sysPrefix);
+  let userCert: Certificate|undefined;
+  for (const certName of list) {
+    const cert = await keyChain.getCert(certName);
+    const subjectName = CertNaming.toSubjectName(cert.name);
+    let id: string;
+    if (subjectName.length === state.sysPrefix.length + 1 &&
+        isID((id = subjectName.get(-1)!.text))) {
+      userCert = cert;
+      state.myID = id;
+      break;
+    }
+  }
+  if (!userCert) {
+    userCert = await requestCert(profile);
+  }
+  state.dataSigner = await keyChain.getSigner(userCert.name);
+  const regSigner = await keyChain.getPrivateKey(CertNaming.toKeyName(userCert.name));
 
-  prefix = CertNaming.toSubjectName(certName);
-  dataSigner = await keyChain.getSigner(certName);
-
-  const regSigner = await keyChain.getPrivateKey(CertNaming.toKeyName(certName));
   enableNfdPrefixReg(face, {
     signer: regSigner,
   });
 
   const endpoint = new Endpoint({
-    announcement: prefix,
+    announcement: state.sysPrefix.append(state.myID),
   });
   publishCert(endpoint, profile.cert);
-  publishCert(endpoint, cert);
+  publishCert(endpoint, userCert);
   enablePing(endpoint);
 
-  return { prefix, dataSigner };
+  return state;
 }

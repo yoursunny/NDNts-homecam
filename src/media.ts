@@ -1,42 +1,44 @@
-export interface CaptureResult {
-  stream: MediaStream;
-  width: number;
-  height: number;
-  $video: HTMLVideoElement;
-  $canvas: HTMLCanvasElement;
-}
+export type Mode = "camera"|"screen";
 
-export async function startCapture(mode: "camera"|"screen"): Promise<CaptureResult> {
-  let stream: MediaStream;
-  if (mode === "screen") {
+let $video: HTMLVideoElement;
+let $canvas: HTMLCanvasElement;
+let stream: MediaStream;
+let width: number;
+let height: number;
+
+export async function startCapture(mode: Mode, maxLength = 640) {
+  $video = document.querySelector("#p_video") as HTMLVideoElement;
+  $canvas = document.querySelector("#p_canvas") as HTMLCanvasElement;
+
+  if (mode === "camera") {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: false,
+    });
+  } else {
     stream = await (navigator.mediaDevices as any).getDisplayMedia({
       video: {
         cursor: "always",
       },
       audio: false,
     });
-  } else {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: false,
-    });
   }
 
-  const $video = document.querySelector("#app_video") as HTMLVideoElement;
   $video.srcObject = stream;
-  $video.classList.remove("hidden");
   await new Promise((resolve) => $video.addEventListener("canplay", resolve));
   await $video.play();
 
-  let { videoWidth: width, videoHeight: height } = $video;
-  const length = Math.max(width, height);
-  width = width / length * 600;
-  height = height / length * 600;
+  const { videoWidth, videoHeight } = $video;
+  const length = Math.max(videoWidth, videoHeight);
+  width = videoWidth / length * maxLength;
+  height = videoHeight / length * maxLength;
   $video.width = width;
   $video.height = height;
-
-  const $canvas = document.querySelector("#app_canvas") as HTMLCanvasElement;
   $canvas.width = width;
   $canvas.height = height;
-  return { stream, width, height, $video, $canvas };
+}
+
+export async function getImage(type = "image/jpeg", quality = 70): Promise<Blob> {
+  $canvas.getContext("2d")!.drawImage($video, 0, 0, width, height);
+  return new Promise<Blob>((resolve) => $canvas.toBlob((b) => resolve(b!), type, quality));
 }

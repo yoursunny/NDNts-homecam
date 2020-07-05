@@ -1,25 +1,23 @@
-import { Endpoint, Producer } from "@ndn/endpoint";
+import { Endpoint } from "@ndn/endpoint";
 import { Version } from "@ndn/naming-convention2";
 import type { Name, Signer } from "@ndn/packet";
 import { serveMetadata } from "@ndn/rdr";
-import { BufferChunkSource, serve, Server } from "@ndn/segmented-object";
+import { BlobChunkSource, serve, Server } from "@ndn/segmented-object";
 
-import type { CaptureResult } from "./media";
+import { getState } from "./connect";
+import { getImage, Mode, startCapture } from "./media";
 
 const endpoint = new Endpoint({ announcement: false });
+let imagePrefix: Name;
+let dataSigner: Signer;
 let lastVersion = 0;
 const servers: Server[] = [];
-let metaProducer: Producer|undefined;
-let captureTimer = 0;
 
-async function captureImage(prefix: Name, dataSigner: Signer, { width, height, $video, $canvas }: CaptureResult) {
-  $canvas.getContext("2d")!.drawImage($video, 0, 0, width, height);
-  const imageBlob = await new Promise<Blob|null>((resolve) =>
-    $canvas.toBlob(resolve, "image/jpeg", 70));
-  const imageBuffer = new Uint8Array(await imageBlob!.arrayBuffer());
+async function saveImage() {
+  const imageBlob = await getImage();
 
   const version = Math.round(Date.now() / 1000);
-  const producer = serve(prefix.append(Version, version), new BufferChunkSource(imageBuffer), {
+  const producer = serve(imagePrefix.append(Version, version), new BlobChunkSource(imageBlob), {
     endpoint,
     signer: dataSigner,
     freshnessPeriod: 60000,
@@ -31,15 +29,18 @@ async function captureImage(prefix: Name, dataSigner: Signer, { width, height, $
   lastVersion = version;
 }
 
-export function startProducer(prefix: Name, dataSigner: Signer, captured: CaptureResult) {
-  metaProducer?.close();
-  clearInterval(captureTimer);
+export async function startProducer(mode: Mode) {
+  const { sysPrefix, myID } = getState();
+  imagePrefix = sysPrefix.append(myID, "image");
 
-  captureTimer = setInterval(() => captureImage(prefix, dataSigner, captured), 1000) as unknown as number;
-
-  metaProducer = serveMetadata(() => {
+  await startCapture(mode);
+  setInterval(saveImage, 1000);
+  serveMetadata(() => {
     return {
-      name: prefix.append(Version, lastVersion),
+      name: imagePrefix.append(Version, lastVersion),
     };
   }, { endpoint, signer: dataSigner, announcement: false });
+
+  document.querySelector("#p_id")!.textContent = myID;
+  document.querySelector("#p_section")!.classList.remove("hidden");
 }

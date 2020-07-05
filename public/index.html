@@ -2,26 +2,55 @@
 <title>NDNts homecam</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/purecss@1.0.1,npm/purecss@1.0.1/build/grids-responsive-min.min.css">
 <style>
-body { padding: 1em; }
+a { text-decoration:none; }
+html { position:relative; min-height:100%; }
+body { padding:0 0.2rem 6rem 0.2rem; }
+@media(min-width:980px) { body { padding:0 3rem 6rem 3rem; } }
+footer { position:absolute; right:0; bottom:0; left:0; padding:1rem 3rem 1rem 3rem; }
 </style>
 
-<form id="app_watch_form" class="pure-form">
+<section id="home_section" class="pure-g">
+
+<div class="pure-u-1">
+<h1>HomeCam: NDNts Home Surveillance and Screencast</h1>
+</div>
+
+<div class="pure-u-1 pure-u-md-1-2">
+<h2>View a Stream</h2>
+<form id="c_form" class="pure-form pure-form-stacked">
 <fieldset>
-<input id="app_watch_name" type="text" class="pure-input-2-3" placeholder="stream name">
-<button type="submit" class="pure-button">watch</button>
+<input id="c_form_stream" type="text" placeholder="stream ID">
+<button type="submit" class="pure-button pure-button-primary">watch</button>
 </fieldset>
 </form>
+</div>
 
-<form id="app_stream_form" class="pure-form">
+<div class="pure-u-1 pure-u-md-1-2">
+<h2>Share a Stream</h2>
+<form id="p_form" class="pure-form pure-form-stacked">
 <fieldset>
-<input id="app_stream_name" type="text" class="pure-input-2-3" readonly>
-<button type="submit" class="pure-button" name="mode" value="camera">stream camera</button>
-<button type="submit" class="pure-button" name="mode" value="screen">stream screen</button>
+<label class="pure-radio"><input type="radio" name="mode" value="camera" checked> camera</label>
+<label class="pure-radio"><input type="radio" name="mode" value="screen"> screen</label>
+<button type="submit" class="pure-button pure-button-primary">start</button>
 </fieldset>
 </form>
+</div>
 
-<video id="app_video" class="hidden"></video>
-<canvas id="app_canvas" class="hidden"></canvas>
-<img id="app_viewer" class="hidden">
+</section>
+
+<section id="c_section" class="hidden">
+<h1>HomeCam: viewing <span id="c_id"></span></h1>
+<img id="c_img">
+</section>
+
+<section id="p_section" class="hidden">
+<h1>HomeCam: streaming <span id="p_id"></span></h1>
+<video id="p_video"></video>
+<canvas id="p_canvas" class="hidden"></canvas>
+</section>
+
+<footer>
+<p>&copy; yoursunny.com, powered by <a href="https://yoursunny.com/p/NDNts/" target="_blank">NDNts</a>, <a href="https://github.com/yoursunny/NDNts-homecam" target="_blank">source code</a></p>
+</footer>
 
 <script src="bundle.js"></script>
