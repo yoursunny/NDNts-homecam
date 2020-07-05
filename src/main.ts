@@ -6,7 +6,16 @@ import type { Mode } from "./media";
 import { startProducer } from "./producer";
 
 async function main() {
-  await connect();
+  const $loading = document.querySelector("#loading") as HTMLDivElement;
+  $loading.classList.remove("hidden");
+  $loading.textContent = "loading";
+  try {
+    await connect();
+  } catch (err) {
+    $loading.textContent = (err as Error).toString();
+    throw err;
+  }
+  $loading.remove();
 
   const id = hashGet("viewer");
   if (isID(id)) {
@@ -16,6 +25,7 @@ async function main() {
   }
 
   const $cForm = document.querySelector("#c_form") as HTMLFormElement;
+  $cForm.classList.remove("hidden");
   $cForm.addEventListener("submit", (evt) => {
     evt.preventDefault();
     const $cFormStream = document.querySelector("#c_form_stream") as HTMLInputElement;
@@ -29,6 +39,7 @@ async function main() {
   });
 
   const $pForm = document.querySelector("#p_form") as HTMLFormElement;
+  $pForm.classList.remove("hidden");
   $pForm.addEventListener("submit", async (evt) => {
     evt.preventDefault();
     const mode = ($pForm.querySelector("input[name=mode]:checked") as HTMLInputElement).value as Mode;

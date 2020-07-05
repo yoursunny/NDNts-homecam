@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<meta charset="utf-8">
 <title>NDNts homecam</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/purecss@1.0.1,npm/purecss@1.0.1/build/grids-responsive-min.min.css">
 <style>
@@ -15,10 +16,13 @@ footer { position:absolute; right:0; bottom:0; left:0; padding:1rem 3rem 1rem 3r
 <h1>HomeCam: NDNts Home Surveillance and Screencast</h1>
 </div>
 
+<div id="loading" class="pure-u-1 hidden">
+</div>
+
 <div class="pure-u-1 pure-u-md-1-2">
-<h2>View a Stream</h2>
-<form id="c_form" class="pure-form pure-form-stacked">
+<form id="c_form" class="pure-form pure-form-stacked hidden">
 <fieldset>
+<legend>View a Stream</legend>
 <input id="c_form_stream" type="text" placeholder="stream ID">
 <button type="submit" class="pure-button pure-button-primary">watch</button>
 </fieldset>
@@ -26,9 +30,9 @@ footer { position:absolute; right:0; bottom:0; left:0; padding:1rem 3rem 1rem 3r
 </div>
 
 <div class="pure-u-1 pure-u-md-1-2">
-<h2>Share a Stream</h2>
-<form id="p_form" class="pure-form pure-form-stacked">
+<form id="p_form" class="pure-form pure-form-stacked hidden">
 <fieldset>
+<legend>Share a Stream</legend>
 <label class="pure-radio"><input type="radio" name="mode" value="camera" checked> camera</label>
 <label class="pure-radio"><input type="radio" name="mode" value="screen"> screen</label>
 <button type="submit" class="pure-button pure-button-primary">start</button>
@@ -47,6 +51,7 @@ footer { position:absolute; right:0; bottom:0; left:0; padding:1rem 3rem 1rem 3r
 <h1>HomeCam: streaming <span id="p_id"></span></h1>
 <video id="p_video"></video>
 <canvas id="p_canvas" class="hidden"></canvas>
+<p>Link to this stream: <code id="p_link"></code></p>
 </section>
 
 <footer>

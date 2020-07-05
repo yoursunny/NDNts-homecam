@@ -42,5 +42,6 @@ export async function startProducer(mode: Mode) {
   }, { endpoint, signer: dataSigner, announcement: false });
 
   document.querySelector("#p_id")!.textContent = myID;
+  document.querySelector("#p_link")!.textContent = new URL(`#viewer=${myID}`, location.href).toString();
   document.querySelector("#p_section")!.classList.remove("hidden");
 }
