@@ -1,0 +1,22 @@
+name: build
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "14"
+      - run: npm install
+      - run: npm run build
+      - name: check code style
+        run: |
+          npm run lint && [[ $(git status --porcelain | tee /dev/stderr | wc -l) -eq 0 ]]
+      - uses: sebastianpopp/ftp-action@releases/v2
+        with:
+          host: ${{ secrets.FTP_SERVER }}
+          user: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          localdir: "public"
