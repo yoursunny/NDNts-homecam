@@ -1,11 +1,12 @@
 import { Endpoint } from "@ndn/endpoint";
 import { Name } from "@ndn/packet";
 import { retrieveMetadata } from "@ndn/rdr";
-import { fetch } from "@ndn/segmented-object";
+import { fetch, RttEstimator } from "@ndn/segmented-object";
 
 import { getState } from "./connect";
 
 const endpoint = new Endpoint({ retx: 2 });
+const rtte = new RttEstimator();
 let streamPrefix: Name;
 let $img: HTMLImageElement;
 let lastImageName = new Name();
@@ -18,9 +19,8 @@ async function retrieveImage() {
   }
   lastImageName = imageName;
 
-  const imageBuffer = await fetch.promise(imageName, { endpoint });
-  const imageBlob = new Blob([imageBuffer]);
-  const objectUrl = URL.createObjectURL(imageBlob);
+  const imageBuffer = await fetch.promise(imageName, { endpoint, rtte });
+  const objectUrl = URL.createObjectURL(new Blob([imageBuffer]));
   $img.src = objectUrl;
   if (lastObjectUrl) {
     URL.revokeObjectURL(lastObjectUrl);
