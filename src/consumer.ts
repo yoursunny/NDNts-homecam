@@ -1,4 +1,5 @@
 import { Endpoint } from "@ndn/endpoint";
+import { Version } from "@ndn/naming-convention2";
 import { Name } from "@ndn/packet";
 import { retrieveMetadata } from "@ndn/rdr";
 import { fetch, RttEstimator } from "@ndn/segmented-object";
@@ -9,6 +10,7 @@ const endpoint = new Endpoint({ retx: 2 });
 const rtte = new RttEstimator();
 let streamPrefix: Name;
 let $img: HTMLImageElement;
+let $message: HTMLParagraphElement;
 let lastImageName = new Name();
 let lastObjectUrl = "";
 
@@ -26,11 +28,14 @@ async function retrieveImage() {
     URL.revokeObjectURL(lastObjectUrl);
   }
   lastObjectUrl = objectUrl;
+  $message.textContent = `Retrieved: ${imageName.at(-1).as(Version)}`;
 }
 
 async function reloadImage() {
   try {
     await retrieveImage();
+  } catch (err) {
+    $message.textContent = String(err);
   } finally {
     setTimeout(reloadImage, 200);
   }
@@ -40,6 +45,7 @@ export function startConsumer(id: string) {
   const { sysPrefix } = getState();
   streamPrefix = sysPrefix.append(id, "image");
   $img = document.querySelector("#c_img") as HTMLImageElement;
+  $message = document.querySelector("#c_message") as HTMLParagraphElement;
   setTimeout(reloadImage, 200);
 
   document.querySelector("#c_id")!.textContent = id;

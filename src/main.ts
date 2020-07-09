@@ -20,7 +20,7 @@ async function main() {
   try {
     await connect();
   } catch (err) {
-    $loading.textContent = (err as Error).toString();
+    $loading.textContent = String(err);
     throw err;
   }
   $loading.remove();
