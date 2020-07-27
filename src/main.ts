@@ -7,8 +7,8 @@ import { startConsumer } from "./consumer";
 import type { Mode } from "./media";
 import { startProducer } from "./producer";
 
-if (location.hostname === "homecam.ndn.today") {
-  galite("create", "UA-935676-13", "auto");
+if (location.hostname.endsWith(".ndn.today")) {
+  galite("create", "UA-935676-11", "auto");
   galite("send", "pageview");
   Bugsnag.start({ apiKey: "9cdcc5bd49b3680e9aa4acee93171a8b" });
 }
