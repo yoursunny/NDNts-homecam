@@ -1,6 +1,6 @@
 import { connectToTestbed } from "@ndn/autoconfig";
 import { Endpoint } from "@ndn/endpoint";
-import { Certificate, CertNaming, KeyChain, RsaPrivateKey, ValidityPeriod } from "@ndn/keychain";
+import { Certificate, CertNaming, generateSigningKey, KeyChain, RSA, ValidityPeriod } from "@ndn/keychain";
 import { CaProfile, ClientNopChallenge, requestCertificate } from "@ndn/ndncert";
 import { enableNfdPrefixReg } from "@ndn/nfdmgmt";
 import { Data, Name, Signer } from "@ndn/packet";
@@ -39,7 +39,7 @@ async function openUplink() {
 async function requestCert(profile: CaProfile): Promise<Certificate> {
   state.myID = Math.floor(Math.random() * 999999999).toString(10).padStart(9, "0");
   const subjectName = state.sysPrefix.append(state.myID);
-  const [privateKey, publicKey] = await RsaPrivateKey.generate(subjectName, 2048, keyChain);
+  const [privateKey, publicKey] = await generateSigningKey(keyChain, subjectName, RSA);
   const cert = await requestCertificate({
     profile,
     publicKey,
@@ -94,7 +94,7 @@ export async function connect() {
     userCert = await requestCert(profile);
   }
   state.dataSigner = await keyChain.getSigner(userCert.name);
-  const regSigner = await keyChain.getPrivateKey(CertNaming.toKeyName(userCert.name));
+  const regSigner = await keyChain.getKey(CertNaming.toKeyName(userCert.name), "signer");
 
   enableNfdPrefixReg(face, {
     signer: regSigner,
