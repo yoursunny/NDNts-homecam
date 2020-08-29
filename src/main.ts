@@ -13,18 +13,7 @@ if (location.hostname.endsWith(".ndn.today")) {
   Bugsnag.start({ apiKey: "9cdcc5bd49b3680e9aa4acee93171a8b" });
 }
 
-async function main() {
-  const $loading = document.querySelector("#loading") as HTMLDivElement;
-  $loading.classList.remove("hidden");
-  $loading.textContent = "loading";
-  try {
-    await connect();
-  } catch (err) {
-    $loading.textContent = String(err);
-    throw err;
-  }
-  $loading.remove();
-
+function enableConsumer() {
   const id = hashGet("viewer");
   if (isID(id)) {
     startConsumer(id);
@@ -45,7 +34,9 @@ async function main() {
     startConsumer(id);
     document.querySelector("#home_section")!.classList.add("hidden");
   });
+}
 
+function enableProducer() {
   const $pForm = document.querySelector("#p_form") as HTMLFormElement;
   $pForm.classList.remove("hidden");
   $pForm.addEventListener("submit", async (evt) => {
@@ -58,6 +49,21 @@ async function main() {
     }
     document.querySelector("#home_section")!.classList.add("hidden");
   });
+}
+
+async function main() {
+  const $loading = document.querySelector("#loading") as HTMLDivElement;
+  $loading.classList.remove("hidden");
+  $loading.textContent = "loading";
+  try {
+    await connect(enableConsumer);
+  } catch (err) {
+    $loading.textContent = String(err);
+    throw err;
+  }
+  $loading.remove();
+
+  enableProducer();
 }
 
 window.addEventListener("load", main);

@@ -65,7 +65,7 @@ function enablePing(endpoint: Endpoint) {
   });
 }
 
-export async function connect() {
+export async function connect(onConsumerAvailable?: () => void) {
   const [profile, face] = await Promise.all([
     (async () => {
       const resp = await fetch("profile.data");
@@ -77,6 +77,8 @@ export async function connect() {
   ]);
 
   state.sysPrefix = profile.prefix.getPrefix(-1).append("homecam");
+  onConsumerAvailable?.();
+
   const list = await keyChain.listCerts(state.sysPrefix);
   let userCert: Certificate|undefined;
   for (const certName of list) {
@@ -106,6 +108,4 @@ export async function connect() {
   publishCert(endpoint, profile.cert);
   publishCert(endpoint, userCert);
   enablePing(endpoint);
-
-  return state;
 }
