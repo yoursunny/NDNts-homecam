@@ -13,6 +13,7 @@ let $img: HTMLImageElement;
 let $message: HTMLParagraphElement;
 let lastImageName = new Name();
 let lastObjectUrl = "";
+let estimatedFinalSegNum = 5;
 
 async function retrieveImage() {
   const { name: imageName } = await retrieveMetadata(streamPrefix, { endpoint });
@@ -21,7 +22,10 @@ async function retrieveImage() {
   }
   lastImageName = imageName;
 
-  const imageBuffer = await fetch.promise(imageName, { endpoint, rtte });
+  const fetchResult = fetch(imageName, { endpoint, rtte, estimatedFinalSegNum });
+  const imageBuffer = await fetchResult;
+  estimatedFinalSegNum = fetchResult.count;
+
   const objectUrl = URL.createObjectURL(new Blob([imageBuffer]));
   $img.src = objectUrl;
   if (lastObjectUrl) {
