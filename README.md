@@ -8,6 +8,7 @@ In this proof-of-concept implementation, the stream is 1 fps and has no sound, a
 
 Build instructions:
 
-1. `npm install` to install dependencies.
-2. `npm run serve` to start development server.
-3. `npm run build` to compile production site in `public/`.
+1. Setup [NDNts-CA](https://github.com/yoursunny/NDNts-CA) with `nop` challenge, and save CA profile in `public/profile.data`.
+2. `npm install` to install dependencies.
+3. `npm run serve` to start development server.
+4. `npm run build` to compile production site in `public/`.
