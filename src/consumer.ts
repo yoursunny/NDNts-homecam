@@ -38,7 +38,7 @@ async function retrieveImage() {
 async function reloadImage() {
   try {
     await retrieveImage();
-  } catch (err) {
+  } catch (err: unknown) {
     $message.textContent = String(err);
   } finally {
     setTimeout(reloadImage, 200);

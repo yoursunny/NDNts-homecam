@@ -57,7 +57,7 @@ async function main() {
   $loading.textContent = "loading";
   try {
     await connect(enableConsumer);
-  } catch (err) {
+  } catch (err: unknown) {
     $loading.textContent = String(err);
     throw err;
   }

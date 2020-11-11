@@ -3,8 +3,8 @@ const path = require("path");
 
 /** @return {import("webpack").Configuration} */
 module.exports = (env, argv) => ({
+  devtool: argv.mode === "development" ? "eval-cheap-module-source-map" : "source-map",
   entry: "./src/main.ts",
-  devtool: argv.mode === "development" ? "cheap-module-eval-source-map" : "source-map",
   module: {
     rules: [
       {
@@ -21,6 +21,7 @@ module.exports = (env, argv) => ({
     filename: "bundle.js",
     path: path.resolve(__dirname, "public"),
   },
+  node: false,
   devServer: {
     contentBase: path.join(__dirname, "public"),
     disableHostCheck: true,
