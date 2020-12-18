@@ -31,9 +31,7 @@ async function openUplink() {
   if (faces.length === 0) {
     throw new Error("unable to connect to NDN testbed");
   }
-  const face = faces[0];
-  face.addRoute(new Name("/"));
-  return face;
+  return faces[0];
 }
 
 async function requestCert(profile: CaProfile): Promise<Certificate> {
@@ -86,7 +84,8 @@ export async function connect(onConsumerAvailable?: () => void) {
     const subjectName = CertNaming.toSubjectName(cert.name);
     let id: string;
     if (subjectName.length === state.sysPrefix.length + 1 &&
-        isID((id = subjectName.get(-1)!.text))) {
+        isID((id = subjectName.get(-1)!.text)) &&
+        cert.validity.includes(Date.now() + 1800000)) {
       userCert = cert;
       state.myID = id;
       break;
