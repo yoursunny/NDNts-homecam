@@ -21,6 +21,7 @@ async function saveImage() {
     endpoint,
     signer: dataSigner,
     freshnessPeriod: 60000,
+    announcement: false,
   });
   servers.push(producer);
   while (servers.length > 20) {

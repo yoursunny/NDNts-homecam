@@ -5,6 +5,6 @@
   npm install
   npm run lint && [[ $(git status --porcelain | tee >(cat 1>&2) | wc -l) -eq 0 ]]
   npm run build
-  curl -sL https://gist.githubusercontent.com/yoursunny/54db5b27f9193859b7d1c83f0aeb8d6d/raw/ca-profile.data.base64 | base64 -d > public/profile.data
+  curl -sfL https://gist.githubusercontent.com/yoursunny/54db5b27f9193859b7d1c83f0aeb8d6d/raw/ca-profile.data.base64 | base64 -d > public/profile.data
   """
   publish = "public/"

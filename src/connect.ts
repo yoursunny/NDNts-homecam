@@ -74,7 +74,7 @@ export async function connect(onConsumerAvailable?: () => void) {
     openUplink(),
   ]);
 
-  state.sysPrefix = profile.prefix.getPrefix(-1).append("homecam");
+  state.sysPrefix = profile.prefix.append("homecam");
   onConsumerAvailable?.();
 
   const list = await keyChain.listCerts(state.sysPrefix);
