@@ -1,4 +1,4 @@
-# HomeCam: NDNts Home Surveillance and Screencast
+# HomeCam: Home Surveillance and Screencast
 
 Production site: [https://homecam.ndn.today/](https://homecam.ndn.today/).
 

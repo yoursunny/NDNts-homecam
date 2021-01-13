@@ -4,17 +4,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/purecss@2.0.3,npm/purecss@2.0.3/build/grids-responsive-min.min.css">
 <style>
-a { text-decoration:none; }
-html { position:relative; min-height:100%; }
-body { padding:0 0.2rem 6rem 0.2rem; }
-@media(min-width:980px) { body { padding:0 3rem 6rem 3rem; } }
-footer { position:absolute; right:0; bottom:0; left:0; padding:1rem 3rem 1rem 3rem; }
+a { text-decoration: none; color: #0074D9; }
+html { position: relative; min-height: 100%; }
+body { padding: 0 0.2rem 6rem 0.2rem; }
+@media(min-width:980px) { body { padding: 0 3rem 6rem 3rem; } }
+footer { position: absolute; right: 0; bottom: 0; left: 0; padding: 1rem 3rem 1rem 3rem; }
+#techinfo { margin-top: 3rem; }
+#techinfo li { line-height: 1.5rem; }
 </style>
 
 <section id="home_section" class="pure-g">
 
 <div class="pure-u-1">
-<h1>HomeCam: NDNts Home Surveillance and Screencast</h1>
+<h1>HomeCam: Home Surveillance and Screencast</h1>
 </div>
 
 <div class="pure-u-1 pure-u-md-1-2">
@@ -41,6 +43,25 @@ footer { position:absolute; right:0; bottom:0; left:0; padding:1rem 3rem 1rem 3r
 <div id="loading" class="pure-u-1 hidden">
 </div>
 
+<aside id="techinfo" class="pure-u-1">
+<details open>
+<summary>About HomeCam</summary>
+<p>HomeCam is built with:</p>
+<ul>
+<li>Named Data Networking global testbed</li>
+<li><a href="https://yoursunny.com/p/NDNts/" target="_blank" rel="noopener">NDNts</a>, Named Data Networking libraries for the modern web</li>
+<li>HTML MediaDevices API: getUserMedia and getDisplayMedia</li>
+</ul>
+
+<p>HomeCam related links:</p>
+<ul>
+<li><a href="https://github.com/yoursunny/NDNts-homecam" target="_blank" rel="noopener">GitHub repository</a></li>
+<li><a href="https://yoursunny.com/t/2020/NDNts-NDNcomm2020/">NDNts Demo at NDN Community Meeting 2020</a>, including a section on HomeCam</li>
+<li><a href="https://yoursunny.com/t/2017/how-homecam-works/">How HomeCam Works?</a>, describing the original version since 2013</li>
+</ul>
+</details>
+</aside>
+
 </section>
 
 <section id="c_section" class="hidden">
@@ -57,7 +78,7 @@ footer { position:absolute; right:0; bottom:0; left:0; padding:1rem 3rem 1rem 3r
 </section>
 
 <footer>
-<p>&copy; yoursunny.com, powered by <a href="https://yoursunny.com/p/NDNts/" target="_blank">NDNts</a>, <a href="https://github.com/yoursunny/NDNts-homecam" target="_blank">source code</a></p>
+<p>&copy; yoursunny.com, powered by <a href="https://yoursunny.com/p/NDNts/" target="_blank" rel="noopener">NDNts</a></p>
 </footer>
 
 <script src="bundle.js"></script>

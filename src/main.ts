@@ -54,14 +54,18 @@ function enableProducer() {
 async function main() {
   const $loading = document.querySelector("#loading") as HTMLDivElement;
   $loading.classList.remove("hidden");
-  $loading.textContent = "loading";
+  $loading.textContent = "HomeCam is connecting to the global NDN testbed and requesting a certificate, please wait.";
   try {
     await connect(enableConsumer);
   } catch (err: unknown) {
-    $loading.textContent = String(err);
+    // Googlebot would interpret error message as "soft 404" error
+    if (!navigator.userAgent.includes("Googlebot/")) {
+      $loading.textContent = String(err);
+    }
     throw err;
   }
   $loading.remove();
+  (document.querySelector("#techinfo > details") as HTMLDetailsElement).open = false;
 
   enableProducer();
 }
