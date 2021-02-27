@@ -48,8 +48,8 @@ async function reloadImage() {
 export function startConsumer(id: string) {
   const { sysPrefix } = getState();
   streamPrefix = sysPrefix.append(id, "image");
-  $img = document.querySelector("#c_img") as HTMLImageElement;
-  $message = document.querySelector("#c_message") as HTMLParagraphElement;
+  $img = document.querySelector<HTMLImageElement>("#c_img")!;
+  $message = document.querySelector<HTMLParagraphElement>("#c_message")!;
   setTimeout(reloadImage, 200);
 
   document.querySelector("#c_id")!.textContent = id;

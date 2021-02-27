@@ -7,8 +7,8 @@ let width: number;
 let height: number;
 
 export async function startCapture(mode: Mode, maxLength = 640) {
-  $video = document.querySelector("#p_video") as HTMLVideoElement;
-  $canvas = document.querySelector("#p_canvas") as HTMLCanvasElement;
+  $video = document.querySelector<HTMLVideoElement>("#p_video")!;
+  $canvas = document.querySelector<HTMLCanvasElement>("#p_canvas")!;
 
   if (mode === "camera") {
     stream = await navigator.mediaDevices.getUserMedia({

@@ -21,11 +21,11 @@ function enableConsumer() {
     return;
   }
 
-  const $cForm = document.querySelector("#c_form") as HTMLFormElement;
+  const $cForm = document.querySelector<HTMLFormElement>("#c_form")!;
   $cForm.classList.remove("hidden");
   $cForm.addEventListener("submit", (evt) => {
     evt.preventDefault();
-    const $cFormStream = document.querySelector("#c_form_stream") as HTMLInputElement;
+    const $cFormStream = document.querySelector<HTMLInputElement>("#c_form_stream")!;
     const id = $cFormStream.value;
     if (!isID(id)) {
       alert("invalid stream ID"); // eslint-disable-line no-alert
@@ -37,11 +37,11 @@ function enableConsumer() {
 }
 
 function enableProducer() {
-  const $pForm = document.querySelector("#p_form") as HTMLFormElement;
+  const $pForm = document.querySelector("#p_form")!;
   $pForm.classList.remove("hidden");
   $pForm.addEventListener("submit", async (evt) => {
     evt.preventDefault();
-    const mode = ($pForm.querySelector("input[name=mode]:checked") as HTMLInputElement).value as Mode;
+    const mode = $pForm.querySelector<HTMLInputElement>("input[name=mode]:checked")!.value as Mode;
     try {
       await startProducer(mode);
     } catch {
@@ -52,7 +52,7 @@ function enableProducer() {
 }
 
 async function main() {
-  const $loading = document.querySelector("#loading") as HTMLDivElement;
+  const $loading = document.querySelector("#loading")!;
   $loading.classList.remove("hidden");
   $loading.textContent = "HomeCam is connecting to the global NDN testbed and requesting a certificate, please wait.";
   try {
@@ -65,7 +65,7 @@ async function main() {
     throw err;
   }
   $loading.remove();
-  (document.querySelector("#techinfo > details") as HTMLDetailsElement).open = false;
+  document.querySelector<HTMLDetailsElement>("#techinfo > details")!.open = false;
 
   enableProducer();
 }
