@@ -49,12 +49,6 @@ async function requestCert(profile: CaProfile): Promise<Certificate> {
   return cert;
 }
 
-function publishCert(endpoint: Endpoint, cert: Certificate) {
-  endpoint.produce(CertNaming.toKeyName(cert.name), async (interest) => {
-    return cert.data;
-  });
-}
-
 function enablePing(endpoint: Endpoint) {
   endpoint.produce(state.sysPrefix.append(state.myID, "ping"), async (interest) => {
     const data = new Data(interest.name, Data.FreshnessPeriod(1));
@@ -95,16 +89,15 @@ export async function connect(onConsumerAvailable?: () => void) {
     userCert = await requestCert(profile);
   }
   state.dataSigner = await keyChain.getSigner(userCert.name);
-  const regSigner = await keyChain.getKey(CertNaming.toKeyName(userCert.name), "signer");
 
   enableNfdPrefixReg(face, {
-    signer: regSigner,
+    signer: state.dataSigner,
+    preloadCertName: userCert.name,
+    preloadFromKeyChain: keyChain,
   });
 
   const endpoint = new Endpoint({
     announcement: state.sysPrefix.append(state.myID),
   });
-  publishCert(endpoint, profile.cert);
-  publishCert(endpoint, userCert);
   enablePing(endpoint);
 }
