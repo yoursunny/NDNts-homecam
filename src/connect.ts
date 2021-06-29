@@ -1,4 +1,4 @@
-import { connectToTestbed } from "@ndn/autoconfig";
+import { connectToNetwork } from "@ndn/autoconfig";
 import { Endpoint } from "@ndn/endpoint";
 import { Certificate, CertNaming, generateSigningKey, KeyChain, ValidityPeriod } from "@ndn/keychain";
 import { CaProfile, ClientNopChallenge, requestCertificate } from "@ndn/ndncert";
@@ -22,15 +22,15 @@ export function getState() {
 }
 
 async function openUplink() {
-  const faces = await connectToTestbed({
+  const faces = await connectToNetwork({
+    fch: {
+      // yoursunny ndn6 network does not yet support prefix announcement
+      server: "https://ndn-fch.named-data.net",
+      count: 4,
+    },
     connectTimeout: 5000,
-    count: 4,
-    fchFallback: ["hobo.cs.arizona.edu", "titan.cs.memphis.edu"],
-    preferFastest: true,
+    fallback: ["hobo.cs.arizona.edu", "ndn-testbed.ewi.tudelft.nl", "uum.testbed.named-data.net"],
   });
-  if (faces.length === 0) {
-    throw new Error("unable to connect to NDN testbed");
-  }
   return faces[0];
 }
 
@@ -72,7 +72,7 @@ export async function connect(onConsumerAvailable?: () => void) {
   onConsumerAvailable?.();
 
   const list = await keyChain.listCerts(state.sysPrefix);
-  let userCert: Certificate|undefined;
+  let userCert: Certificate | undefined;
   for (const certName of list) {
     const cert = await keyChain.getCert(certName);
     const subjectName = CertNaming.toSubjectName(cert.name);

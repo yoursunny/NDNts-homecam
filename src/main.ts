@@ -11,6 +11,11 @@ if (location.hostname.endsWith(".ndn.today")) {
   galite("create", "UA-935676-11", "auto");
   galite("send", "pageview");
   Bugsnag.start({ apiKey: "9cdcc5bd49b3680e9aa4acee93171a8b" });
+} else {
+  Bugsnag.start({
+    apiKey: "00000000000000000000000000000000",
+    enabledReleaseStages: [],
+  });
 }
 
 function enableConsumer() {

@@ -1,4 +1,4 @@
-export type Mode = "camera"|"screen";
+export type Mode = "camera" | "screen";
 
 let $video: HTMLVideoElement;
 let $canvas: HTMLCanvasElement;

@@ -3,11 +3,10 @@
   "scripts": {
     "build": "webpack",
     "lint": "xo --fix",
-    "pnpm-install": "pnpm install --shamefully-hoist",
     "serve": "webpack serve --mode=development"
   },
   "dependencies": {
-    "@bugsnag/js": "^7.8.0",
+    "@bugsnag/js": "^7.10.4",
     "@ndn/autoconfig": "https://ndnts-nightly.ndn.today/autoconfig.tgz",
     "@ndn/endpoint": "https://ndnts-nightly.ndn.today/endpoint.tgz",
     "@ndn/keychain": "https://ndnts-nightly.ndn.today/keychain.tgz",
@@ -20,13 +19,13 @@
     "@ndn/tlv": "https://ndnts-nightly.ndn.today/tlv.tgz",
     "ga-lite": "^2.0.5",
     "hashquery": "^1.0.0",
-    "tslib": "^2.1.0"
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@yoursunny/xo-config": "^0.38.0",
-    "ts-loader": "^8.0.18",
-    "typescript": "^4.2.3",
-    "webpack": "^5.25.0",
+    "@yoursunny/xo-config": "^0.40.1",
+    "ts-loader": "^9.2.3",
+    "typescript": "^4.3.4",
+    "webpack": "^5.41.1",
     "webpack-cli": "^4.5.0",
     "webpack-dev-server": "^3.11.2"
   }
