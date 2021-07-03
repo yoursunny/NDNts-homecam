@@ -1,11 +1,10 @@
 import { Metadata } from "@ndn/rdr";
-import { Extension, NNI } from "@ndn/tlv";
-
-const [HomecamMetadata_, HomecamMetadataExtensions] = Metadata.makeExtensible("HomcamMetadata");
+import { Extensible, Extension, ExtensionRegistry, NNI } from "@ndn/tlv";
 
 const TtInitVersion = 0xA55C;
 
-HomecamMetadataExtensions.registerExtension<number>({
+const EXTENSIONS = new ExtensionRegistry();
+EXTENSIONS.registerExtension<number>({
   tt: TtInitVersion,
   decode(obj, tlv) {
     void obj;
@@ -17,24 +16,15 @@ HomecamMetadataExtensions.registerExtension<number>({
   },
 });
 
-export const HomecamMetadata = HomecamMetadata_;
+@Metadata.extend
+export class HomecamMetadata extends Metadata implements Extensible {
+  public readonly [Extensible.TAG] = EXTENSIONS;
 
-export namespace HomecamMetadataInitVersion {
-  export function get(m: Metadata): number {
-    return (Extension.get(m as any, TtInitVersion) as number | undefined) ?? 0;
+  public get initVersion(): number {
+    return (Extension.get(this, TtInitVersion) as number | undefined) ?? 0;
   }
 
-  export function set(m: Metadata, v: number): void {
-    Extension.set(m as any, TtInitVersion, v);
+  public set initVersion(v: number) {
+    Extension.set(this, TtInitVersion, v);
   }
 }
-
-// export class HomecamMetadata extends HomecamMetadataBase {
-//   public get initVersion(): number {
-//     return (Extension.get(this, TtInitVersion) as number | undefined) ?? 0;
-//   }
-
-//   public set initVersion(v: number) {
-//     Extension.set(this, TtInitVersion, v);
-//   }
-// }

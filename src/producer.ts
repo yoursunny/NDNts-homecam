@@ -8,7 +8,7 @@ import { BlobChunkSource, serve, Server } from "@ndn/segmented-object";
 import pEvent from "p-event";
 
 import { getState } from "./connect";
-import { HomecamMetadata, HomecamMetadataInitVersion } from "./metadata";
+import { HomecamMetadata } from "./metadata";
 
 export type Mode = "camera" | "camera-mic" | "screen";
 
@@ -32,9 +32,8 @@ export async function startProducer(mode: Mode) {
 
   await startCapture(mode);
   serveMetadata(() => {
-    const m = new HomecamMetadata();
-    m.name = streamPrefix.append(Version, lastVersion);
-    HomecamMetadataInitVersion.set(m, initVersion);
+    const m = new HomecamMetadata(streamPrefix.append(Version, lastVersion));
+    m.initVersion = initVersion;
     return m;
   }, { endpoint, signer, announcement: false, prefix: streamPrefix });
 

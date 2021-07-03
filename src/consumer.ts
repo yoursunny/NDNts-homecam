@@ -6,7 +6,7 @@ import { fetch, RttEstimator } from "@ndn/segmented-object";
 import pEvent from "p-event";
 
 import { getState } from "./connect";
-import { HomecamMetadata, HomecamMetadataInitVersion } from "./metadata";
+import { HomecamMetadata } from "./metadata";
 
 const endpoint = new Endpoint({ retx: 2 });
 const rtte = new RttEstimator();
@@ -44,9 +44,8 @@ async function tryRetrieveClip() {
 }
 
 async function retrieveClip() {
-  const m = await retrieveMetadata(streamPrefix, { endpoint, Metadata: HomecamMetadata });
-  let { name } = m;
-  const initVersion = HomecamMetadataInitVersion.get(m);
+  const m = await retrieveMetadata(streamPrefix, HomecamMetadata, { endpoint });
+  let { name, initVersion } = m;
   if (initVersion === 0) {
     return;
   }
