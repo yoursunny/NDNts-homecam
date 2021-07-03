@@ -1,5 +1,5 @@
 import { Endpoint } from "@ndn/endpoint";
-import { Version } from "@ndn/naming-convention2";
+import { SequenceNum } from "@ndn/naming-convention2";
 import { Name } from "@ndn/packet";
 import { retrieveMetadata } from "@ndn/rdr";
 import { fetch, RttEstimator } from "@ndn/segmented-object";
@@ -8,17 +8,22 @@ import pEvent from "p-event";
 import { getState } from "./connect";
 import { HomecamMetadata } from "./metadata";
 
-const endpoint = new Endpoint({ retx: 2 });
-const rtte = new RttEstimator();
+const endpoint = new Endpoint({ retx: 1 });
+const rtte = new RttEstimator({ maxRto: 3000 });
 let streamPrefix: Name;
 let $video: HTMLVideoElement;
 let $message: HTMLParagraphElement;
 
-let playingInit = 0;
+let restarting = false;
+let abort: AbortController | undefined;
+let versionPrefix: Name | undefined;
+let currentVersion = 0;
+let currentSequenceNum = 0;
+let lastAppended = -1;
+let estimatedFinalSegNum = 1;
+let nFetchErrors = 0;
 let mediaSource: MediaSource;
 let sourceBuffer: SourceBuffer;
-let lastVersion = new Name();
-let estimatedFinalSegNum = 1;
 
 export async function startConsumer(id: string) {
   const { sysPrefix } = getState();
@@ -26,71 +31,96 @@ export async function startConsumer(id: string) {
   $video = document.querySelector<HTMLVideoElement>("#c_video")!;
   $message = document.querySelector<HTMLParagraphElement>("#c_message")!;
 
-  setTimeout(tryRetrieveClip, 200);
+  setInterval(tryLoadClip, 1000);
 
   document.querySelector("#c_id")!.textContent = id;
   document.querySelector("#c_section")!.classList.remove("hidden");
 }
 
-async function tryRetrieveClip() {
+async function tryLoadClip() {
   try {
-    await retrieveClip();
+    await loadClip();
   } catch (err: unknown) {
-    $message.textContent = `${err}`;
+    $message.textContent = `clip=${currentVersion},${currentSequenceNum} ${err}`;
     throw err;
   } finally {
-    setTimeout(tryRetrieveClip, 200);
+    ++currentSequenceNum;
   }
 }
 
-async function retrieveClip() {
-  const m = await retrieveMetadata(streamPrefix, HomecamMetadata, { endpoint });
-  let { name, initVersion } = m;
-  if (initVersion === 0) {
-    return;
-  }
-  if (initVersion !== playingInit) {
-    name = name.getPrefix(-1).append(Version, initVersion);
-  } else if (name.equals(lastVersion)) {
-    return;
+async function loadClip() {
+  if (!versionPrefix || nFetchErrors >= 3) {
+    if (restarting) {
+      return;
+    }
+    try {
+      restarting = true;
+      return await restartVideo();
+    } finally {
+      restarting = false;
+    }
   }
 
-  const fetchResult = fetch(name, { endpoint, rtte, estimatedFinalSegNum });
-  const mediaData = await fetchResult;
-  if (initVersion !== playingInit) {
-    await restartVideo(initVersion);
-  }
-  lastVersion = name;
-  estimatedFinalSegNum = fetchResult.count;
-
-  sourceBuffer.appendBuffer(mediaData);
-  await pEvent(sourceBuffer, "updateend");
+  const size = await fetchAppendClip(currentSequenceNum);
 
   const [playhead, buffered] = adjustPlayhead();
-  $message.textContent = `clip=${name.at(-1).as(Version)} size=${mediaData.length} play=${playhead} buffered=${JSON.stringify(buffered)}`;
+  $message.textContent = `clip=${currentVersion},${currentSequenceNum} size=${size} srtt=${
+    rtte.sRtt.toFixed(0)} play=${playhead} buffered=${JSON.stringify(buffered)}`;
 }
 
-async function restartVideo(initVersion: number) {
-  $video.pause();
+async function fetchAppendClip(seqNum: number) {
+  try {
+    const fetchResult = fetch(
+      versionPrefix!.append(SequenceNum, seqNum),
+      { endpoint, rtte, estimatedFinalSegNum, retxLimit: 2, signal: abort!.signal });
+    const payload = await fetchResult;
+    estimatedFinalSegNum = fetchResult.count;
+
+    if (seqNum > lastAppended) {
+      lastAppended = seqNum;
+      sourceBuffer.appendBuffer(payload);
+      await pEvent(sourceBuffer, "updateend");
+    }
+
+    return payload.length;
+  } catch (err: unknown) {
+    ++nFetchErrors;
+    throw err;
+  }
+}
+
+async function restartVideo() {
+  abort?.abort();
+  abort = new AbortController();
+  nFetchErrors = 0;
+  lastAppended = -1;
+
+  $message.textContent = "connecting to stream source";
+  const m = await retrieveMetadata(streamPrefix, HomecamMetadata, { endpoint, signal: abort.signal });
+  ({ versionPrefix, currentVersion, currentSequenceNum } = m);
+  $message.textContent = `clip=${currentVersion},${currentSequenceNum} starting`;
 
   mediaSource = new MediaSource();
+  $video.pause();
   $video.src = URL.createObjectURL(mediaSource);
   await pEvent(mediaSource, "sourceopen");
   URL.revokeObjectURL($video.src);
 
-  sourceBuffer = mediaSource.addSourceBuffer("video/webm;codecs=vp8,opus");
+  sourceBuffer = mediaSource.addSourceBuffer(m.mimeType);
+  await fetchAppendClip(0);
+
+  $video.currentTime = 0;
+  await $video.play();
+
   void (async () => {
-    await pEvent(sourceBuffer, "updateend");
-    $video.currentTime = 0;
-    await $video.play();
+    const err = await pEvent(sourceBuffer, "error");
+    console.warn("sourceBuffer.err", err, $video.error);
   })();
 
   void (async () => {
     await pEvent(mediaSource, "sourceclose");
-    playingInit = 0;
+    versionPrefix = undefined;
   })();
-
-  playingInit = initVersion;
 }
 
 function adjustPlayhead() {

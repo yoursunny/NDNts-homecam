@@ -7,9 +7,12 @@ declare global {
   class MediaRecorder extends EventTarget {
     static isTypeSupported(type: string): boolean;
     constructor(stream: MediaStream, options?: MediaRecorderOptions);
-    readonly state: RecordingState;
+    readonly videoBitsPerSecond: number;
+    readonly audioBitsPerSecond: number;
+
     start(timeslice?: number): void;
     stop(): void;
+    requestData(): void;
 
     addEventListener<K extends keyof MediaRecorderEventMap>(type: K, listener: (this: MediaRecorder, ev: MediaRecorderEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
     addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
@@ -20,8 +23,6 @@ declare global {
     audioBitsPerSecond?: number;
     videoBitsPerSecond?: number;
   }
-
-  type RecordingState = "inactive" | "recording" | "paused";
 
   interface BlobEvent extends Event {
     readonly data: Blob;

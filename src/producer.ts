@@ -1,7 +1,7 @@
 import "./media-api";
 
 import { Endpoint } from "@ndn/endpoint";
-import { Version } from "@ndn/naming-convention2";
+import { SequenceNum, Version } from "@ndn/naming-convention2";
 import type { Name, Signer } from "@ndn/packet";
 import { serveMetadata } from "@ndn/rdr";
 import { BlobChunkSource, serve, Server } from "@ndn/segmented-object";
@@ -12,28 +12,37 @@ import { HomecamMetadata } from "./metadata";
 
 export type Mode = "camera" | "camera-mic" | "screen";
 
+let $message: HTMLParagraphElement;
 const endpoint = new Endpoint({ announcement: false });
 let streamPrefix: Name;
 let signer: Signer;
+let versionPrefix: Name;
+let currentVersion = 0;
+let currentSequenceNum = 0;
 
+let mimeType: string;
 let stream: MediaStream;
 let $video: HTMLVideoElement;
 let recorder: MediaRecorder;
 
-let initVersion = 0;
 let initServer: Server | undefined;
-let lastVersion = 0;
 const servers: Server[] = [];
 
 export async function startProducer(mode: Mode) {
+  $message = document.querySelector<HTMLParagraphElement>("#p_message")!;
   const { sysPrefix, myID, dataSigner } = getState();
   streamPrefix = sysPrefix.append(myID, "stream");
   signer = dataSigner;
+  currentVersion = Date.now();
+  currentSequenceNum = 0;
+  versionPrefix = streamPrefix.append(Version, currentVersion);
 
+  $message.textContent = "starting";
   await startCapture(mode);
   serveMetadata(() => {
-    const m = new HomecamMetadata(streamPrefix.append(Version, lastVersion));
-    m.initVersion = initVersion;
+    const m = new HomecamMetadata();
+    m.name = versionPrefix.append(SequenceNum, currentSequenceNum);
+    m.mimeType = mimeType;
     return m;
   }, { endpoint, signer, announcement: false, prefix: streamPrefix });
 
@@ -43,12 +52,13 @@ export async function startProducer(mode: Mode) {
 }
 
 async function startCapture(mode: Mode) {
+  const audio = mode === "camera-mic";
   if (mode === "screen") {
     stream = await navigator.mediaDevices.getDisplayMedia({
       video: {
         cursor: "always",
       },
-      audio: false,
+      audio,
     });
   } else {
     stream = await navigator.mediaDevices.getUserMedia({
@@ -56,7 +66,7 @@ async function startCapture(mode: Mode) {
         width: 640,
         height: 640,
       },
-      audio: mode === "camera-mic",
+      audio,
     });
   }
 
@@ -65,32 +75,33 @@ async function startCapture(mode: Mode) {
   await pEvent($video, "canplay");
   await $video.play();
 
+  mimeType = audio ? "video/webm;codecs=vp8,opus" : "video/webm;codecs=vp8";
   recorder = new MediaRecorder(stream, {
-    mimeType: "video/webm;codecs=vp8,opus",
+    mimeType,
     audioBitsPerSecond: 16000,
     videoBitsPerSecond: 100000,
   });
   recorder.addEventListener("dataavailable", handleRecorderData);
   recorder.start(1000);
+
+  $message.textContent = `${mimeType} video=${recorder.videoBitsPerSecond}bps audio=${recorder.audioBitsPerSecond}bps`;
 }
 
 function handleRecorderData(evt: BlobEvent) {
-  const version = Math.floor(Date.now() / 1000);
-  const producer = serve(streamPrefix.append(Version, version), new BlobChunkSource(evt.data, { chunkSize: 7500 }), {
-    endpoint,
-    signer,
-    freshnessPeriod: 60000,
-    announcement: false,
-  });
+  $message.textContent = `clip=${currentVersion},${currentSequenceNum} size=${evt.data.size}`;
+  const producer = serve(
+    versionPrefix.append(SequenceNum, currentSequenceNum),
+    new BlobChunkSource(evt.data, { chunkSize: 7500 }),
+    { endpoint, signer, freshnessPeriod: 60000, announcement: false });
 
   if (!initServer) { // eslint-disable-line no-negated-condition
     initServer = producer;
-    initVersion = version;
   } else {
     servers.push(producer);
     while (servers.length > 20) {
       servers.shift()!.close();
     }
   }
-  lastVersion = version;
+
+  ++currentSequenceNum;
 }
