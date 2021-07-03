@@ -33,7 +33,8 @@ footer { position: absolute; right: 0; bottom: 0; left: 0; padding: 1rem 3rem 1r
 <form id="p_form" class="pure-form pure-form-stacked hidden">
 <fieldset>
 <legend>Share a Stream</legend>
-<label class="pure-radio"><input type="radio" name="mode" value="camera" checked> camera</label>
+<label class="pure-radio"><input type="radio" name="mode" value="camera" checked> camera only</label>
+<label class="pure-radio"><input type="radio" name="mode" value="camera-mic"> camera + microphone</label>
 <label class="pure-radio"><input type="radio" name="mode" value="screen"> screen</label>
 <button type="submit" class="pure-button pure-button-primary">start</button>
 </fieldset>
@@ -66,14 +67,13 @@ footer { position: absolute; right: 0; bottom: 0; left: 0; padding: 1rem 3rem 1r
 
 <section id="c_section" class="hidden">
 <h1>HomeCam: viewing <span id="c_id"></span></h1>
-<img id="c_img">
+<video id="c_video"></video>
 <p id="c_message"></p>
 </section>
 
 <section id="p_section" class="hidden">
 <h1>HomeCam: streaming <span id="p_id"></span></h1>
-<video id="p_video"></video>
-<canvas id="p_canvas" class="hidden"></canvas>
+<video id="p_video" muted></video>
 <p>Link to this stream: <code id="p_link"></code></p>
 </section>
 

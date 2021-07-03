@@ -4,8 +4,7 @@ import { get as hashGet } from "hashquery";
 
 import { connect, isID } from "./connect";
 import { startConsumer } from "./consumer";
-import type { Mode } from "./media";
-import { startProducer } from "./producer";
+import { Mode, startProducer } from "./producer";
 
 if (location.hostname.endsWith(".ndn.today")) {
   galite("create", "UA-935676-11", "auto");
@@ -21,7 +20,7 @@ if (location.hostname.endsWith(".ndn.today")) {
 function enableConsumer() {
   const id = hashGet("viewer");
   if (isID(id)) {
-    startConsumer(id);
+    void startConsumer(id);
     document.querySelector("#home_section")!.classList.add("hidden");
     return;
   }
@@ -36,7 +35,7 @@ function enableConsumer() {
       alert("invalid stream ID"); // eslint-disable-line no-alert
       return;
     }
-    startConsumer(id);
+    void startConsumer(id);
     document.querySelector("#home_section")!.classList.add("hidden");
   });
 }
