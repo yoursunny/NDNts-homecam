@@ -1,5 +1,3 @@
-import "./media-api";
-
 import { Endpoint } from "@ndn/endpoint";
 import { SequenceNum, Version } from "@ndn/naming-convention2";
 import type { Name, Signer } from "@ndn/packet";
@@ -55,9 +53,9 @@ async function startCapture(mode: Mode) {
   const audio = mode === "camera-mic";
   if (mode === "screen") {
     stream = await navigator.mediaDevices.getDisplayMedia({
-      video: {
+      video: { // eslint-disable-line @typescript-eslint/consistent-type-assertions
         cursor: "always",
-      },
+      } as MediaTrackConstraints,
       audio,
     });
   } else {

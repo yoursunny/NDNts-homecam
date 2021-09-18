@@ -22,9 +22,12 @@ module.exports = (env, { mode = "production" }) => ({
     path: path.resolve(__dirname, "public"),
   },
   node: false,
+  /** @type {import("webpack-dev-server").Configuration} */
   devServer: {
-    contentBase: path.join(__dirname, "public"),
-    disableHostCheck: true,
+    allowedHosts: "all",
     port: 3333,
+    static: {
+      directory: path.join(__dirname, "public"),
+    },
   },
 });
