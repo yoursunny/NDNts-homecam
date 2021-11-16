@@ -3,8 +3,8 @@
   set -eo pipefail
   rm -rf package-lock.json node_modules/\\@ndn
   npm install
-  npm run lint && [[ $(git status --porcelain | tee >(cat 1>&2) | wc -l) -eq 0 ]]
+  npm run lint && git diff --exit-code
   npm run build
-  curl -sfL https://gist.githubusercontent.com/yoursunny/54db5b27f9193859b7d1c83f0aeb8d6d/raw/ca-profile.data.base64 | base64 -d > public/profile.data
+  curl -sfLS https://gist.githubusercontent.com/yoursunny/54db5b27f9193859b7d1c83f0aeb8d6d/raw/ca-profile.data.base64 | base64 -d > public/profile.data
   """
   publish = "public/"

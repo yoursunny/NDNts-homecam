@@ -3,7 +3,7 @@ import { SequenceNum, Version } from "@ndn/naming-convention2";
 import type { Name, Signer } from "@ndn/packet";
 import { serveMetadata } from "@ndn/rdr";
 import { BlobChunkSource, serve, Server as SegmentedServer } from "@ndn/segmented-object";
-import pEvent from "p-event";
+import { pEvent } from "p-event";
 
 import { getState } from "./connect";
 import { HomecamMetadata } from "./metadata";
