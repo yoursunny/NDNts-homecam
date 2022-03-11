@@ -3,7 +3,7 @@ import { Endpoint } from "@ndn/endpoint";
 import { Certificate, CertNaming, generateSigningKey, KeyChain, ValidityPeriod } from "@ndn/keychain";
 import { CaProfile, ClientNopChallenge, requestCertificate } from "@ndn/ndncert";
 import { enableNfdPrefixReg } from "@ndn/nfdmgmt";
-import { Data, Name, Signer } from "@ndn/packet";
+import { type Signer, Data, Name } from "@ndn/packet";
 import { Decoder } from "@ndn/tlv";
 
 export function isID(id: string): boolean {

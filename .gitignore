@@ -1,6 +1,7 @@
-.vscode
+/.pnpm-debug.log
+/.vscode
+/package-lock.json
+/pnpm-lock.yaml
+/public/bundle.*
+/public/profile.data
 node_modules
-package-lock.json
-pnpm-lock.yaml
-public/bundle.*
-public/profile.data

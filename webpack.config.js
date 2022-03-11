@@ -3,7 +3,7 @@ const path = require("path");
 /** @return {import("webpack").Configuration} */
 module.exports = (env, { mode = "production" }) => ({
   mode,
-  devtool: mode === "development" ? "eval-cheap-module-source-map" : "source-map",
+  devtool: mode === "development" ? "cheap-module-source-map" : "source-map",
   entry: "./src/main.ts",
   module: {
     rules: [

@@ -1,5 +1,7 @@
 import Bugsnag from "@bugsnag/js";
+// @ts-expect-error typing unavailable
 import galite from "ga-lite";
+// @ts-expect-error typing unavailable
 import { get as hashGet } from "hashquery";
 
 import { connect, isID } from "./connect";

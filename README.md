@@ -9,6 +9,6 @@ There is no end-to-end encryption and no privacy in this proof-of-concept implem
 Build instructions:
 
 1. Setup [NDNts-CA](https://github.com/yoursunny/NDNts-CA) with `nop` challenge, and save CA profile in `public/profile.data`.
-2. `npm install` to install dependencies.
-3. `npm run serve` to start development server.
-4. `npm run build` to compile production site in `public/`.
+2. `corepack pnpm install` to install dependencies.
+3. `corepack pnpm serve` to start development server.
+4. `corepack pnpm build` to compile production site in `public/`.
