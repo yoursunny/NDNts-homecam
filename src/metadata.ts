@@ -1,5 +1,6 @@
 import { Metadata } from "@ndn/rdr";
-import { Extensible, Extension, ExtensionRegistry, NNI, toUtf8 } from "@ndn/tlv";
+import { Extensible, Extension, ExtensionRegistry, NNI } from "@ndn/tlv";
+import { toUtf8 } from "@ndn/util";
 
 const TtMimeType = 0x8301;
 const TtTimeSlice = 0x8303;
