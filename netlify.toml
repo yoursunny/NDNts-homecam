@@ -1,6 +1,7 @@
 [build]
   command = """
-  set -eo pipefail
+  set -euo pipefail
+  rm -rf node_modules/@ndn node_modules/.pnpm/@ndn*
   corepack pnpm install
   corepack pnpm build
   corepack pnpm lint && git diff --exit-code
@@ -9,5 +10,5 @@
   publish = "public/"
 
 [build.environment]
-  NODE_VERSION="17"
+  NODE_VERSION="18"
   NPM_FLAGS="--version"
