@@ -1,6 +1,6 @@
 import { Endpoint } from "@ndn/endpoint";
 import { SequenceNum, Version } from "@ndn/naming-convention2";
-import { Name } from "@ndn/packet";
+import type { Name } from "@ndn/packet";
 import { retrieveMetadata } from "@ndn/rdr";
 import { fetch, RttEstimator } from "@ndn/segmented-object";
 import { pEvent } from "p-event";

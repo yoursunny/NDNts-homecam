@@ -1,12 +1,12 @@
 import Bugsnag from "@bugsnag/js";
-// @ts-expect-error typing unavailable
+// @ts-expect-error type
 import galite from "ga-lite";
-// @ts-expect-error typing unavailable
+// @ts-expect-error type
 import { get as hashGet } from "hashquery";
 
 import { connect, isID } from "./connect";
 import { startConsumer } from "./consumer";
-import { Mode, startProducer } from "./producer";
+import { type Mode, startProducer } from "./producer";
 
 if (location.hostname.endsWith(".ndn.today")) {
   galite("create", "UA-935676-11", "auto");

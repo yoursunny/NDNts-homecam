@@ -1,9 +1,10 @@
 import { connectToNetwork } from "@ndn/autoconfig";
 import { Endpoint } from "@ndn/endpoint";
-import { Certificate, CertNaming, generateSigningKey, KeyChain, ValidityPeriod } from "@ndn/keychain";
+import { type Certificate, CertNaming, generateSigningKey, KeyChain, ValidityPeriod } from "@ndn/keychain";
 import { CaProfile, ClientNopChallenge, requestCertificate } from "@ndn/ndncert";
 import { enableNfdPrefixReg } from "@ndn/nfdmgmt";
 import { type Signer, Data, Name } from "@ndn/packet";
+import { H3Transport } from "@ndn/quic-transport";
 import { Decoder } from "@ndn/tlv";
 
 export function isID(id: string): boolean {
@@ -23,13 +24,13 @@ export function getState() {
 
 async function openUplink() {
   const faces = await connectToNetwork({
+    H3Transport,
+    preferH3: true,
     fch: {
-      // yoursunny ndn6 network does not yet support prefix announcement
-      server: "https://ndn-fch.named-data.net",
       count: 4,
     },
     connectTimeout: 5000,
-    fallback: ["hobo.cs.arizona.edu", "ndn-testbed.ewi.tudelft.nl", "uum.testbed.named-data.net"],
+    fallback: ["hobo.cs.arizona.edu", "ndn-testbed.ewi.tudelft.nl"],
   });
   return faces[0];
 }
