@@ -3,7 +3,7 @@
 Production site: [https://homecam.ndn.today/](https://homecam.ndn.today/).
 
 HomeCam is a web application built with [NDNts](https://yoursunny.com/p/NDNts/) and web technologies.
-It allows a visitor to share their webcam or screen over the NDN testbed, and others can watch the stream using a link.
+It allows a visitor to share their webcam or screen over a NDN network, and others can watch the stream using a link.
 There is no end-to-end encryption and no privacy in this proof-of-concept implementation.
 
 Build instructions:

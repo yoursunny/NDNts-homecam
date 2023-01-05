@@ -5,7 +5,7 @@
     "lint": "xo --fix",
     "serve": "webpack serve --mode=development"
   },
-  "packageManager": "pnpm@7.21.0",
+  "packageManager": "pnpm@7.22.0",
   "dependencies": {
     "@bugsnag/js": "^7.18.0",
     "@ndn/autoconfig": "https://ndnts-nightly.ndn.today/autoconfig.tgz",

@@ -28,9 +28,9 @@ async function openUplink() {
     preferH3: true,
     fch: {
       count: 4,
+      network: "yoursunny",
     },
     connectTimeout: 5000,
-    fallback: ["hobo.cs.arizona.edu", "ndn-testbed.ewi.tudelft.nl"],
   });
   return faces[0];
 }

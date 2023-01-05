@@ -60,7 +60,7 @@ function enableProducer() {
 async function main() {
   const $loading = document.querySelector("#loading")!;
   $loading.classList.remove("hidden");
-  $loading.textContent = "HomeCam is connecting to the global NDN testbed and requesting a certificate, please wait.";
+  $loading.textContent = "HomeCam is connecting to the ndn6 network and requesting a certificate, please wait.";
   try {
     await connect(enableConsumer);
   } catch (err: unknown) {
