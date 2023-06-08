@@ -3,7 +3,7 @@ import { Endpoint } from "@ndn/endpoint";
 import { type Certificate, CertNaming, generateSigningKey, KeyChain, ValidityPeriod } from "@ndn/keychain";
 import { CaProfile, ClientNopChallenge, requestCertificate } from "@ndn/ndncert";
 import { enableNfdPrefixReg } from "@ndn/nfdmgmt";
-import { type Signer, Data, Name } from "@ndn/packet";
+import { Data, Name, type Signer } from "@ndn/packet";
 import { H3Transport } from "@ndn/quic-transport";
 import { Decoder } from "@ndn/tlv";
 

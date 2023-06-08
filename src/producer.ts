@@ -1,8 +1,8 @@
-import { type Producer as EndpointProducer, Endpoint } from "@ndn/endpoint";
+import { Endpoint, type Producer as EndpointProducer } from "@ndn/endpoint";
 import { SequenceNum, Version } from "@ndn/naming-convention2";
 import type { Name, Signer } from "@ndn/packet";
 import { serveMetadata } from "@ndn/rdr";
-import { type Server as SegmentedServer, BlobChunkSource, serve } from "@ndn/segmented-object";
+import { BlobChunkSource, serve, type Server as SegmentedServer } from "@ndn/segmented-object";
 import { pEvent } from "p-event";
 
 import { getState } from "./connect";
